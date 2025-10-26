@@ -1,0 +1,42 @@
+[project]
+name = "ots-plugin-template" # TODO: The name must start with OTS-
+description = "Plugin template for OpenTAKServer plugins"
+authors = [{name = "OpenTAKServer", email = "opentakserver@gmail.com"}]
+readme = "README.md"
+license = "GPL-3.0-or-later"
+repository = "https://github.com/brian7704/OpenTAKServer"
+documentation = "https://docs.opentakserver.io"
+dynamic = ["entry-points", "version"]
+
+[tool.poetry]
+# TODO: Remove the following line if your plugin doesn't have a UI. If it does have a UI, make sure to run "npm run build" in your UI repo before "poetry build"
+include = [{path = "ots_plugin_template/ui/**/*", format = ["sdist", "wheel"]}]
+version = "0.0.0"
+
+[tool.poetry.dependencies]
+opentakserver = ">=1.5.0"
+python = ">=3.10, <4.0"
+# TODO: Add dependencies here
+
+# This poetry plugin will automatically set your plugin's version based on git tags. Please use semantic versioning https://semver.org/
+[tool.poetry-dynamic-versioning]
+enable = true
+vcs = "git"
+style = "semver"
+dirty = false
+pattern = "((?P<epoch>\\d+)!)?(?P<base>\\d+(\\.\\d+)*)"
+
+[tool.poetry-dynamic-versioning.files."ots_plugin_template/__init__.py"] # TODO: Change the folder name in this line
+persistent-substitution = true
+initial-content = """
+  # These version placeholders will be replaced later during substitution.
+  __version__ = "0.0.0"
+  __version_tuple__ = (0, 0, 0)
+"""
+
+[build-system]
+requires = ["poetry-core>=2.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0", "setuptools"]
+build-backend = "poetry_dynamic_versioning.backend"
+
+[project.entry-points.'opentakserver.plugin']
+ots_plugin_template = 'ots_plugin_template.app:PluginTemplate' # TODO: Change this to your plugin's name
