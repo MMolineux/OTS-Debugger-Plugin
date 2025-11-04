@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OTS Debugger - Log Viewer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+      body {
+        font-family: "Courier New", monospace;
+        margin: 0;
+        padding: 20px;
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+      }
+
+      h2 {
+        color: #4ec9b0;
+        margin-top: 0;
+      }
+
+      #controls {
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: #252526;
+        border-radius: 4px;
+      }
+
+      button {
+        padding: 8px 16px;
+        margin-right: 10px;
+        background-color: #0e639c;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      button:hover {
+        background-color: #1177bb;
+      }
+
+      #status {
+        display: inline-block;
+        margin-left: 20px;
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+
+      #status.connected {
+        background-color: #4ec9b0;
+        color: #1e1e1e;
+      }
+
+      #status.disconnected {
+        background-color: #f48771;
+        color: #1e1e1e;
+      }
+
+      #log-container {
+        background-color: #252526;
+        border: 1px solid #3e3e42;
+        border-radius: 4px;
+        padding: 10px;
+        height: calc(100vh - 180px);
+        overflow-y: auto;
+      }
+
+      .log-line {
+        padding: 4px 0;
+        border-bottom: 1px solid #3e3e42;
+        word-wrap: break-word;
+      }
+
+      .log-line:last-child {
+        border-bottom: none;
+      }
+
+      .log-line .timestamp {
+        color: #858585;
+        margin-right: 10px;
+      }
+
+      .log-line .content {
+        color: #d4d4d4;
+      }
+
+      #log-count {
+        margin-top: 10px;
+        color: #858585;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>OTS Debugger - Log Viewer</h2>
+
+    <div id="controls">
+      <button onclick="clearLogs()">Clear Logs</button>
+      <button onclick="toggleAutoScroll()">
+        <span id="autoscroll-text">Disable Auto-scroll</span>
+      </button>
+      <span id="status" class="disconnected">Disconnected</span>
+      <span id="log-count">0 log lines</span>
+    </div>
+
+    <div id="log-container"></div>
+
+    <script>
+      // Connect to Socket.IO server on /debugger namespace
+      var socket = io.connect(window.location.origin + "/debugger");
+      var autoScroll = true;
+      var logCount = 0;
+
+      // Connection status handlers
+      socket.on("connect", function () {
+        console.log("Connected to server");
+        updateStatus(true);
+      });
+
+      socket.on("disconnect", function () {
+        console.log("Disconnected from server");
+        updateStatus(false);
+      });
+
+      // Listen for log events from server
+      socket.on("cot", function (data) {
+        addLogLine(data);
+      });
+
+      function updateStatus(connected) {
+        var statusEl = document.getElementById("status");
+        if (connected) {
+          statusEl.textContent = "Connected";
+          statusEl.className = "connected";
+        } else {
+          statusEl.textContent = "Disconnected";
+          statusEl.className = "disconnected";
+        }
+      }
+
+      function addLogLine(data) {
+        var logContainer = document.getElementById("log-container");
+        var logLine = document.createElement("div");
+        logLine.className = "log-line";
+
+        var timestamp = new Date().toLocaleTimeString();
+        var logContent = typeof data === "string" ? data : JSON.stringify(data);
+
+        logLine.innerHTML =
+          '<span class="timestamp">[' +
+          timestamp +
+          "]</span>" +
+          '<span class="content">' +
+          escapeHtml(logContent) +
+          "</span>";
+
+        logContainer.appendChild(logLine);
+        logCount++;
+        updateLogCount();
+
+        // Auto-scroll to bottom if enabled
+        if (autoScroll) {
+          logContainer.scrollTop = logContainer.scrollHeight;
+        }
+      }
+
+      function clearLogs() {
+        document.getElementById("log-container").innerHTML = "";
+        logCount = 0;
+        updateLogCount();
+      }
+
+      function toggleAutoScroll() {
+        autoScroll = !autoScroll;
+        var text = document.getElementById("autoscroll-text");
+        text.textContent = autoScroll
+          ? "Disable Auto-scroll"
+          : "Enable Auto-scroll";
+      }
+
+      function updateLogCount() {
+        var countEl = document.getElementById("log-count");
+        countEl.textContent =
+          logCount + " log line" + (logCount !== 1 ? "s" : "");
+      }
+
+      function escapeHtml(text) {
+        var map = {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;",
+        };
+        return text.replace(/[&<>"']/g, function (m) {
+          return map[m];
+        });
+      }
+    </script>
+  </body>
+</html>

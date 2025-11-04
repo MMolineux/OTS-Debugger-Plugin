@@ -1,5 +1,3 @@
-# OTS-Plugin-Template
+# OTS-Debugger-Plugin
 
-***
-
-Use this repo as a base for writing plugins for OpenTAKServer. For a working plugin example, see the [AISStream Plugin](https://github.com/brian7704/OTS-AISStream-Plugin).
+Stream, filter and view CoT messages live in the browser.

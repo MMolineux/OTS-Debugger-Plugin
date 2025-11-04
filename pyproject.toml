@@ -1,24 +1,23 @@
 [project]
-name = "ots-plugin-template" # TODO: The name must start with OTS-
-description = "Plugin template for OpenTAKServer plugins"
-authors = [{name = "OpenTAKServer", email = "opentakserver@gmail.com"}]
+name = "OTS-Debugger-Plugin"
+description = "CoT viewer and debugger"
+authors = [{name = "MMolineux"}]
 readme = "README.md"
 license = "GPL-3.0-or-later"
-repository = "https://github.com/brian7704/OpenTAKServer"
-documentation = "https://docs.opentakserver.io"
 dynamic = ["entry-points", "version"]
 
+[project.urls]
+Repository = "https://github.com/MMolineux/OTS-Debugger-Plugin"
+Documentation = "https://github.com/MMolineux/OTS-Debugger-Plugin/wiki"
+
 [tool.poetry]
-# TODO: Remove the following line if your plugin doesn't have a UI. If it does have a UI, make sure to run "npm run build" in your UI repo before "poetry build"
-include = [{path = "ots_plugin_template/ui/**/*", format = ["sdist", "wheel"]}]
+include = [{path = "ots_debugger_plugin/ui/dist/**/*", format = ["sdist", "wheel"]}]
 version = "0.0.0"
 
 [tool.poetry.dependencies]
 opentakserver = ">=1.5.0"
-python = ">=3.10, <4.0"
-# TODO: Add dependencies here
+python = ">=3.10, <3.14"
 
-# This poetry plugin will automatically set your plugin's version based on git tags. Please use semantic versioning https://semver.org/
 [tool.poetry-dynamic-versioning]
 enable = true
 vcs = "git"
@@ -26,7 +25,7 @@ style = "semver"
 dirty = false
 pattern = "((?P<epoch>\\d+)!)?(?P<base>\\d+(\\.\\d+)*)"
 
-[tool.poetry-dynamic-versioning.files."ots_plugin_template/__init__.py"] # TODO: Change the folder name in this line
+[tool.poetry-dynamic-versioning.files."ots_debugger_plugin/__init__.py"]
 persistent-substitution = true
 initial-content = """
   # These version placeholders will be replaced later during substitution.
@@ -39,4 +38,4 @@ requires = ["poetry-core>=2.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0", "se
 build-backend = "poetry_dynamic_versioning.backend"
 
 [project.entry-points.'opentakserver.plugin']
-ots_plugin_template = 'ots_plugin_template.app:PluginTemplate' # TODO: Change this to your plugin's name
+ots_debugger_plugin = 'ots_debugger_plugin.app:DebuggerPlugin'

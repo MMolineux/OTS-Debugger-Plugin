@@ -5,16 +5,18 @@ from flask import Flask
 from opentakserver.extensions import logger
 import pika
 
-# TODO: Use this class to connect to the OTS server's RabbitMQ instance to publish and consume data.
-# See https://github.com/brian7704/OTS-AISStream-Plugin/blob/main/ots_aisstream_plugin/WebsocketWrapper.py for an example
-
 
 class RabbitMQClient:
     def __init__(self, app: Flask):
         self._app = app
 
         try:
-            self.rabbit_connection = pika.SelectConnection(pika.ConnectionParameters(self._app.config.get("OTS_RABBITMQ_SERVER_ADDRESS")), self.on_connection_open)
+            self.rabbit_connection = pika.SelectConnection(
+                pika.ConnectionParameters(
+                    self._app.config.get("OTS_RABBITMQ_SERVER_ADDRESS")
+                ),
+                self.on_connection_open,
+            )
             self.rabbit_channel: Channel = None
             self.iothread = Thread(target=self.rabbit_connection.ioloop.start)
             self.iothread.daemon = True
@@ -33,7 +35,7 @@ class RabbitMQClient:
         raise NotImplemented
 
     def on_close(self, channel, error):
-        logger.error("cot_controller closing RabbitMQ connection: {}".format(error))
+        logger.error("debugger plugin closing RabbitMQ connection: {}".format(error))
 
     def on_message(self, unused_channel, basic_deliver, properties, body):
         raise NotImplemented

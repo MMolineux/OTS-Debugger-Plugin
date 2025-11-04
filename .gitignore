@@ -1,5 +1,6 @@
 opentakserver/secret_key.py
 scripts/
+.vscode/
 ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -8,9 +9,6 @@ __pycache__/
 
 # C extensions
 *.so
-
-# TODO: Change this line
-ots_plugin_template/ui/
 
 # Distribution / packaging
 .Python

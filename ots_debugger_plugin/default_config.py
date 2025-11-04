@@ -12,10 +12,9 @@ class DefaultConfig:
     # This file will be loaded first, followed by user overrides from config.yml
     # Make sure not to duplicate any setting name in OpenTAKServers' defaultconfig.py
 
-    OTS_PLUGIN_TEMPLATE_ENABLED = True  # TODO: This setting is required. Rename it with your plugin's name
-    OTS_PLUGIN_TEMPLATE_SOME_SETTING = "my_setting_value"
+    OTS_DEBUGGER_PLUGIN_ENABLED = True
+    OTS_DEBUGGER_PLUGIN_SOME_SETTING = "my_setting_value"
 
-    # TODO: Use this method to validate config values input by the user in the OTS web UI
     # Make sure the return dict is {"success": False, "error", "Some helpful error message"} if the input is invalid,
     # or {"success": True, "error": ""} if the input is valid
     @staticmethod
@@ -23,8 +22,11 @@ class DefaultConfig:
         try:
             for key, value in config.items():
                 if key not in DefaultConfig.__dict__.keys():
-                    return {"success": False, "error": f"{key} is not a valid config key"}, 400
-                elif key == "OTS_PLUGIN_TEMPLATE_SOME_SETTING" and type(key) is not str:
+                    return {
+                        "success": False,
+                        "error": f"{key} is not a valid config key",
+                    }, 400
+                elif key == "OTS_DEBUGGER_PLUGIN_SOME_SETTING" and type(key) is not str:
                     return {"success": False, "error": f"{key} should be a string"}, 400
 
             return {"success": True, "error": ""}
@@ -37,17 +39,21 @@ class DefaultConfig:
     @staticmethod
     def save_config_settings(settings: dict[str, any]):
         try:
-            with open(os.path.join(app.config.get("OTS_DATA_FOLDER"), "config.yml"), "r") as config_file:
+            with open(
+                os.path.join(app.config.get("OTS_DATA_FOLDER"), "config.yml"), "r"
+            ) as config_file:
                 config = yaml.safe_load(config_file.read())
 
-            for setting, value in settings:
+            for setting, value in settings.items():
                 # Update the config to be written to config.yml
                 config[setting] = value
 
                 # Update OpenTAKServer's running config
                 app.config.update({setting: value})
 
-            with open(os.path.join(app.config.get("OTS_DATA_FOLDER"), "config.yml"), "w") as config_file:
+            with open(
+                os.path.join(app.config.get("OTS_DATA_FOLDER"), "config.yml"), "w"
+            ) as config_file:
                 yaml.safe_dump(config, config_file)
 
         except BaseException as e:
